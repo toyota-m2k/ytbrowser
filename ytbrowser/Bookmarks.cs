@@ -8,22 +8,34 @@ using System.Text;
 using System.Xml.Serialization;
 
 namespace ytbrowser {
-    public class Bookmarks : ObservableCollection<Bookmarks.DxxBookmarkRec> {
-        public class DxxBookmarkRec {
+    public class Bookmarks : ObservableCollection<Bookmarks.BookmarkRec> {
+        public class BookmarkRec {
             public string Name { get; set; }
             public string Url { get; set; }
 
-            public DxxBookmarkRec() {
+            public BookmarkRec() {
 
             }
 
-            public DxxBookmarkRec(string name, string url) {
+            public BookmarkRec(string name, string url) {
                 Name = name;
                 Url = url;
             }
         }
 
-        public bool Serialize() {
+        private static Bookmarks sInstance = null;
+        public static Bookmarks Instance => sInstance;
+        public static void Initialize() {
+            if (null == sInstance) {
+                sInstance = Deserialize();
+            }
+        }
+        public static void Terminate() {
+            sInstance?.Serialize();
+            sInstance = null;
+        }
+
+        private bool Serialize() {
             try {
                 var serializer = new XmlSerializer(this.GetType());
                 //書き込むファイルを開く（UTF-8 BOM無し）
@@ -41,7 +53,7 @@ namespace ytbrowser {
             }
         }
 
-        public static Bookmarks Deserialize() {
+        private static Bookmarks Deserialize() {
             try {
                 //XmlSerializerオブジェクトを作成
                 var serializer = new XmlSerializer(typeof(Bookmarks));
@@ -69,11 +81,11 @@ namespace ytbrowser {
             if (rec != null) {
                 this.Move(IndexOf(rec), 0);
             } else {
-                this.Insert(0, new DxxBookmarkRec(name, url));
+                this.Insert(0, new BookmarkRec(name, url));
             }
         }
         
-        public DxxBookmarkRec FindBookmark(string url) {
+        public BookmarkRec FindBookmark(string url) {
             var org = this.Where((bm) => bm.Url == url);
             if (!Utils.IsNullOrEmpty(org)) {
                 return org.First();
@@ -81,7 +93,7 @@ namespace ytbrowser {
             return null;
         }
 
-        public DxxBookmarkRec RemoveBookmark(string url) {
+        public BookmarkRec RemoveBookmark(string url) {
             var r = FindBookmark(url);
             if (null != r) {
                 Remove(r);
@@ -89,7 +101,7 @@ namespace ytbrowser {
             return r;
         }
 
-        public DxxBookmarkRec BringUpBookmark(string url) {
+        public BookmarkRec BringUpBookmark(string url) {
             var r = FindBookmark(url);
             if (null != r) {
                 var i = IndexOf(r);

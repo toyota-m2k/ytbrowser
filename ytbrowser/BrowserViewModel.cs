@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ytbrowser {
     public class BrowserViewModel : ViewModelBase {
-        public Bookmarks BookmarkList { get; } = Bookmarks.Deserialize();
+        public Bookmarks BookmarkList { get; } = Bookmarks.Instance;
         public ReactiveProperty<string> Url { get; } = new ReactiveProperty<string>();
 
         public ReactiveProperty<bool> HasPrev { get; } = new ReactiveProperty<bool>(false);

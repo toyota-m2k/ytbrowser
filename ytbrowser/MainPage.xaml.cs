@@ -59,10 +59,14 @@ namespace ytbrowser
             this.InitializeComponent();
         }
 
+        private string prevUrl = null;
         private void CopyUrlToClipboard(string url) {
             var uri = FixUpUrl(url);
             if (null != uri && uri.Host=="www.youtube.com" && uri.AbsolutePath=="/watch") {
-                Clipboard.SetContent(new DataPackage().Apply((dp) => dp.SetText(uri.ToString())));
+                if (uri.ToString() != prevUrl) {
+                    prevUrl = uri.ToString();
+                    Clipboard.SetContent(new DataPackage().Apply((dp) => dp.SetText(uri.ToString())));
+                }
             }
         }
 
@@ -152,6 +156,7 @@ namespace ytbrowser
             ViewModel.Url.Value = args.Uri.ToString();
             LMonitor.OnStartLoading(args.Uri.ToString(), false);
             UpdateHistory();
+            CopyUrlToClipboard(args.Uri.ToString());
         }
 
         private void WebView_DOMContentLoaded(WebView sender, WebViewDOMContentLoadedEventArgs args) {
