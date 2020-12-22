@@ -38,23 +38,25 @@
 
         <ControlTemplate x:Key="SvgButtonTemplate" TargetType="Button">
             <Border x:Name="BtnBorder" Background="Transparent" Padding="4" BorderBrush="Transparent" BorderThickness="4">
-                <Viewbox>
-                    <ContentPresenter x:Name="Content"/>
-                </Viewbox>
+                <Canvas Width="24" Height="24">
+                    <Viewbox>
+                        <ContentPresenter x:Name="Content" Foreground="#404040"/>
+                    </Viewbox>
+                </Canvas>
                 <VisualStateManager.VisualStateGroups>
                     <VisualStateGroup x:Name="CommonStates">
                         <VisualState x:Name="Normal">
                         </VisualState>
                         <VisualState x:Name="PointerOver">
                             <VisualState.Setters>
-                                <Setter Target="BtnBorder.BorderBrush" Value="Gray"/>
+                                <Setter Target="BtnBorder.BorderBrush" Value="LightGray"/>
                                 <Setter Target="BtnBorder.Background" Value="Lavender"/>
                                 <Setter Target="Content.Foreground" Value="SteelBlue"/>
                             </VisualState.Setters>
                         </VisualState>
                         <VisualState x:Name="Pressed">
                             <VisualState.Setters>
-                                <Setter Target="BtnBorder.BorderBrush" Value="Gray"/>
+                                <Setter Target="BtnBorder.BorderBrush" Value="LightGray"/>
                                 <Setter Target="BtnBorder.Background" Value="LightSteelBlue"/>
                                 <Setter Target="Content.Foreground" Value="MediumBlue"/>
                             </VisualState.Setters>
@@ -76,9 +78,6 @@
         <Style x:Key="SvgButtonStyle" TargetType="Button">
             <Setter Property="Foreground" Value="#444444"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Padding" Value="{StaticResource SvgButtonPadding}"/>
-            <Setter Property="Width" Value="{StaticResource SvgButtonSize}"/>
-            <Setter Property="Height" Value="{StaticResource SvgButtonSize}"/>
             <Setter Property="Template" Value="{StaticResource SvgButtonTemplate}">
             </Setter>
         </Style>
@@ -162,49 +161,10 @@
             <StackPanel Grid.Column="2" Orientation="Horizontal">
                 <Button 
                     Command="{Binding ShowBookmarkCommand}"
-                    >
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="BtnBorder" Background="Transparent" Padding="4" BorderBrush="Transparent" BorderThickness="4">
-                                <Viewbox>
-                                    <ContentPresenter x:Name="Content"/>
-                                </Viewbox>
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal">
-                                        </VisualState>
-                                        <VisualState x:Name="PointerOver">
-                                            <VisualState.Setters>
-                                                <Setter Target="BtnBorder.BorderBrush" Value="Gray"/>
-                                                <Setter Target="BtnBorder.Background" Value="Lavender"/>
-                                                <Setter Target="Content.Foreground" Value="SteelBlue"/>
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                        <VisualState x:Name="Pressed">
-                                            <VisualState.Setters>
-                                                <Setter Target="BtnBorder.BorderBrush" Value="Gray"/>
-                                                <Setter Target="BtnBorder.Background" Value="LightSteelBlue"/>
-                                                <Setter Target="Content.Foreground" Value="MediumBlue"/>
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                        <VisualState x:Name="Disabled">
-                                            <VisualState.Setters>
-                                                <Setter Target="BtnBorder.BorderBrush" Value="White"/>
-                                                <Setter Target="BtnBorder.Background" Value="White"/>
-                                                <Setter Target="Content.Foreground" Value="Gray"/>
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
-
-                            </Border>
-                        </ControlTemplate>
-
-                    </Button.Template>
+                    Style="{StaticResource SvgButtonStyle}">
                     <PathIcon Data="M19 18l2 1V3c0-1.1-.9-2-2-2H8.99C7.89 1 7 1.9 7 3h10c1.1 0 2 .9 2 2v13zM15 5H5c-1.1 0-2 .9-2 2v16l7-3 7 3V7c0-1.1-.9-2-2-2z"/>
                 </Button>
                 <Button 
-                    Background="Transparent"
                     Command="{Binding CopyToClipboardCommand}"
                     Style="{StaticResource SvgButtonStyle}">
                     <PathIcon Data="M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z"/>
