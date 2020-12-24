@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -95,8 +96,10 @@ namespace ytbrowser
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: アプリケーションの状態を保存してバックグラウンドの動作があれば停止します
-            Bookmarks.Terminate();
-            deferral.Complete();
+            Task.Run(async () => {
+                await Bookmarks.Terminate();
+                deferral.Complete();
+            });
         }
 
         protected override void OnActivated(IActivatedEventArgs args) {

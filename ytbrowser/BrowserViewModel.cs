@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace ytbrowser {
     public class BrowserViewModel : ViewModelBase {
-        public Bookmarks BookmarkList { get; } = Bookmarks.Instance;
+        public ReactiveProperty<Bookmarks> BookmarkList { get; } = new ReactiveProperty<Bookmarks>();
+        public ReactiveProperty<bool> ShowBookmark { get; } = new ReactiveProperty<bool>(false);
         public ReactiveProperty<string> Url { get; } = new ReactiveProperty<string>();
 
         public ReactiveProperty<bool> HasPrev { get; } = new ReactiveProperty<bool>(false);
@@ -30,11 +31,14 @@ namespace ytbrowser {
         public ReactiveCommand<string> NavigateCommand { get; } = new ReactiveCommand<string>();
 
         public BrowserViewModel() {
+            Bookmarks.GetInstance((v) => {
+                BookmarkList.Value = v;
+            });
             ClearURLCommand.Subscribe(()=> {
                 Url.Value = "";
             });
             IsBookmarked = Url.Select((url) => {
-                return BookmarkList.FindBookmark(url) != null;
+                return BookmarkList.Value?.FindBookmark(url) != null;
             }).ToReadOnlyReactiveProperty();
         }
     }

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は、以下の属性セットによって制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更します。
-[assembly: AssemblyTitle("ytbrowser")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Barium")]
+[assembly: AssemblyDescription("Mini Browser for BooTube")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ytbrowser")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyProduct("Barium")]
+[assembly: AssemblyCopyright("Copyright ©  2020 toyota-m2k")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

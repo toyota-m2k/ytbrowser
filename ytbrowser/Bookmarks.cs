@@ -5,13 +5,16 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Windows.Storage;
 
 namespace ytbrowser {
     public class Bookmarks : ObservableCollection<Bookmarks.BookmarkRec> {
         public class BookmarkRec {
             public string Name { get; set; }
             public string Url { get; set; }
+            public string DisplayName => string.IsNullOrWhiteSpace(Name) ? Url : Name;
 
             public BookmarkRec() {
 
@@ -24,44 +27,62 @@ namespace ytbrowser {
         }
 
         private static Bookmarks sInstance = null;
-        public static Bookmarks Instance => sInstance;
-        public static void Initialize() {
+        //public static Bookmarks Instance => sInstance;
+        public static TaskCompletionSource<Bookmarks> InitTaskSource = new TaskCompletionSource<Bookmarks>();
+        public static async void Initialize() {
             if (null == sInstance) {
-                sInstance = Deserialize();
+                sInstance = await Deserialize();
+                InitTaskSource.TrySetResult(sInstance);
             }
         }
-        public static void Terminate() {
-            sInstance?.Serialize();
+        public static async Task Terminate() {
+            await sInstance?.Run(async (bm) => {
+                await bm.Serialize();
+            });
             sInstance = null;
         }
+        public static async void GetInstance(Action<Bookmarks> completed) {
+            var instance = await InitTaskSource.Task;
+            completed(instance);
+        }
 
-        private bool Serialize() {
+        private const string FILENAME = "bookmarks.xml";
+
+        private async Task<bool> Serialize() {
             try {
                 var serializer = new XmlSerializer(this.GetType());
-                //書き込むファイルを開く（UTF-8 BOM無し）
-                using (var sw = new System.IO.StreamWriter("bookmarks.xml", false, new System.Text.UTF8Encoding(false))) {
-
+                using (var sw = new StringWriter(new StringBuilder())) { 
                     //シリアル化し、XMLファイルに保存する
                     serializer.Serialize(sw, this);
-                    sw.Close();
-                    return true;
+                    var xml = sw.ToString();
+                    if(!string.IsNullOrWhiteSpace(xml)) {
+                        var file = await FileUtil.GetOrCreateFile(FILENAME);
+                        if (null != file) {
+                            await FileIO.WriteTextAsync(file, sw.ToString());
+                            return true;
+                        }
+                    }
                 }
             }
             catch (Exception e) {
                 Debug.WriteLine(e);
-                return false;
             }
+            return false;
         }
 
-        private static Bookmarks Deserialize() {
+        private static async Task<Bookmarks> Deserialize() {
             try {
-                //XmlSerializerオブジェクトを作成
-                var serializer = new XmlSerializer(typeof(Bookmarks));
+                // xmlファイルから読み込む
+                var file = await FileUtil.GetFile(FILENAME);
+                if(file==null) {
+                    return new Bookmarks();
+                }
 
-                //読み込むファイルを開く
-                using (var sr = new StreamReader("bookmarks.xml", new UTF8Encoding(false))) {
-
+                var xml = await FileIO.ReadTextAsync(file);
+                using (var sr = new StringReader(xml)) {
                     //XMLファイルから読み込み、逆シリアル化する
+                    //XmlSerializerオブジェクトを作成
+                    var serializer = new XmlSerializer(typeof(Bookmarks));
                     var obj = serializer.Deserialize(sr);
                     if (null == obj) {
                         throw new Exception("cannot be deserialized.");

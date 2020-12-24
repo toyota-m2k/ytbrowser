@@ -164,37 +164,52 @@
                     Style="{StaticResource SvgButtonStyle}">
                     <PathIcon Data="M19 18l2 1V3c0-1.1-.9-2-2-2H8.99C7.89 1 7 1.9 7 3h10c1.1 0 2 .9 2 2v13zM15 5H5c-1.1 0-2 .9-2 2v16l7-3 7 3V7c0-1.1-.9-2-2-2z"/>
                 </Button>
-                <Button 
+                <!--<Button 
                     Command="{Binding CopyToClipboardCommand}"
                     Style="{StaticResource SvgButtonStyle}">
                     <PathIcon Data="M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z"/>
-                </Button>
+                </Button>-->
             </StackPanel>
         </Grid>
-        
-        <WebView 
-            Grid.Row="1"
-            x:Name="Browser"
-            ContainsFullScreenElementChanged="WebView_ContainsFullScreenElementChanged"
-            ContentLoading="WebView_ContentLoading"
-            DOMContentLoaded="WebView_DOMContentLoaded"
-            FrameContentLoading="WebView_FrameContentLoading"
-            FrameDOMContentLoaded="WebView_FrameDOMContentLoaded"
-            FrameNavigationCompleted="WebView_FrameNavigationCompleted"
-            FrameNavigationStarting="WebView_FrameNavigationStarting"
-            LoadCompleted="WebView_LoadCompleted"
-            LongRunningScriptDetected="WebView_LongRunningScriptDetected"
-            NavigationCompleted="WebView_NavigationCompleted"
-            NavigationFailed="WebView_NavigationFailed"
-            NavigationStarting="WebView_NavigationStarting"
-            NewWindowRequested="WebView_NewWindowRequested"
-            PermissionRequested="WebView_PermissionRequested"
-            ScriptNotify="WebView_ScriptNotify"
-            UnsafeContentWarningDisplaying="WebView_UnsafeContentWarningDisplaying"
-            UnsupportedUriSchemeIdentified="WebView_UnsupportedUriSchemeIdentified"
-            UnviewableContentIdentified="WebView_UnviewableContentIdentified"
-            />
 
+        <Grid Grid.Row="1">
+            <WebView 
+                x:Name="Browser"
+                ContainsFullScreenElementChanged="WebView_ContainsFullScreenElementChanged"
+                ContentLoading="WebView_ContentLoading"
+                DOMContentLoaded="WebView_DOMContentLoaded"
+                FrameContentLoading="WebView_FrameContentLoading"
+                FrameDOMContentLoaded="WebView_FrameDOMContentLoaded"
+                FrameNavigationCompleted="WebView_FrameNavigationCompleted"
+                FrameNavigationStarting="WebView_FrameNavigationStarting"
+                LoadCompleted="WebView_LoadCompleted"
+                LongRunningScriptDetected="WebView_LongRunningScriptDetected"
+                NavigationCompleted="WebView_NavigationCompleted"
+                NavigationFailed="WebView_NavigationFailed"
+                NavigationStarting="WebView_NavigationStarting"
+                NewWindowRequested="WebView_NewWindowRequested"
+                PermissionRequested="WebView_PermissionRequested"
+                ScriptNotify="WebView_ScriptNotify"
+                UnsafeContentWarningDisplaying="WebView_UnsafeContentWarningDisplaying"
+                UnsupportedUriSchemeIdentified="WebView_UnsupportedUriSchemeIdentified"
+                UnviewableContentIdentified="WebView_UnviewableContentIdentified"
+                />
+            <ListView 
+                Visibility="{Binding ShowBookmark.Value, Converter={StaticResource BoolVisibilityConverter}}"
+                ItemsSource="{Binding BookmarkList.Value}"
+                MaxWidth="800" VerticalAlignment="Top" HorizontalAlignment="Right"
+                Background="White"
+                >
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Grid>
+                            <TextBlock Text="{Binding DisplayName}" Foreground="Black" FontSize="14" 
+                                VerticalAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
         <Grid Grid.Row="2">
             <TextBlock Text="{Binding StatusLine.Value}" Margin="6,2"/>
         </Grid>

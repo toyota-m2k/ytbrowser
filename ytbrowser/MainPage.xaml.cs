@@ -45,7 +45,7 @@ namespace ytbrowser
             ViewModel.GoForwardCommand.Subscribe(GoForward);
             ViewModel.ReloadCommand.Subscribe(Reload);
             ViewModel.StopCommand.Subscribe(Stop);
-            ViewModel.AddBookmarkCommand.Subscribe(() => AddBookmark(ViewModel.Url.Value));
+            ViewModel.AddBookmarkCommand.Subscribe(() => AddBookmark(Browser.DocumentTitle, ViewModel.Url.Value));
             ViewModel.DelBookmarkCommand.Subscribe(() => DelBookmark(ViewModel.Url.Value));
             ViewModel.ShowBookmarkCommand.Subscribe(ShowBookmarks);
             ViewModel.CopyToClipboardCommand.Subscribe(()=>CopyUrlToClipboard(ViewModel.Url.Value));
@@ -71,15 +71,16 @@ namespace ytbrowser
         }
 
         private void ShowBookmarks() {
+            ViewModel.ShowBookmark.Value = !ViewModel.ShowBookmark.Value;
         }
 
         private void DelBookmark(string value) {
-            ViewModel.BookmarkList.RemoveBookmark(value);
+            ViewModel.BookmarkList.Value.RemoveBookmark(value);
             ViewModel.Url.ForceNotify();
         }
 
-        private void AddBookmark(string value) {
-            ViewModel.BookmarkList.AddBookmark("", value);
+        private void AddBookmark(string name, string value) {
+            ViewModel.BookmarkList.Value.AddBookmark(name, value);
             ViewModel.Url.ForceNotify();
         }
 
@@ -153,6 +154,7 @@ namespace ytbrowser
 
         private void WebView_ContentLoading(WebView sender, WebViewContentLoadingEventArgs args) {
             Debug.WriteLine(callerName());
+            ViewModel.ShowBookmark.Value = false;
             ViewModel.Url.Value = args.Uri.ToString();
             LMonitor.OnStartLoading(args.Uri.ToString(), false);
             UpdateHistory();
