@@ -49,12 +49,6 @@ namespace ytbrowser
             ViewModel.DelBookmarkCommand.Subscribe(() => DelBookmark(ViewModel.Url.Value));
             ViewModel.ShowBookmarkCommand.Subscribe(ShowBookmarks);
             ViewModel.CopyToClipboardCommand.Subscribe(()=>CopyUrlToClipboard(ViewModel.Url.Value));
-            ViewModel.Url.Subscribe((url) => {
-                //var uri = FixUpUrl(url);
-                //if(null!=uri) {
-                //    Clipboard.SetContent(new DataPackage().Apply((dp) => dp.SetText(uri.ToString())));
-                //}
-            });
 
             this.InitializeComponent();
         }

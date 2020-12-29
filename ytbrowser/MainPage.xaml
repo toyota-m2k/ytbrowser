@@ -132,7 +132,7 @@
                 Grid.Column="1" FontSize="14" x:Name="urlInput" 
                 VerticalContentAlignment="Center" 
                 HorizontalAlignment="Stretch"
-                Text="{Binding Url.Value, Mode=TwoWay}" 
+                Text="{Binding Url.Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
                 KeyDown="UrlKeyDown"
                 >
                 <TextBox.Resources>
