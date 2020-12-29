@@ -103,7 +103,7 @@ namespace ytbrowser
         }
 
 
-        private void Navigate(string url) {
+        public void Navigate(string url) {
             var uri = FixUpUrl(url);
             if(uri==null) {
                 return;

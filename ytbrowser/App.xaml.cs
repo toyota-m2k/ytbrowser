@@ -122,16 +122,22 @@ namespace ytbrowser
                 Window.Current.Content = rootFrame;
             }
 
-            //if (e.PrelaunchActivated == false) {
-                if (rootFrame.Content == null) {
-                    // ナビゲーションの履歴スタックが復元されていない場合、最初のページに移動します。
-                    // このとき、必要な情報をナビゲーション パラメーターとして渡して、新しいページを
-                    // 作成します
-                    rootFrame.Navigate(typeof(MainPage), null);
-                }
-                // 現在のウィンドウがアクティブであることを確認します
-                Window.Current.Activate();
-            //}
+            var url = (args as ProtocolActivatedEventArgs)?.Uri.ToString();
+            string param = null;
+            if(url.StartsWith("btytbrs:")) {
+                param = url.Substring(8);
+            }
+
+            if (rootFrame.Content == null) {
+                // ナビゲーションの履歴スタックが復元されていない場合、最初のページに移動します。
+                // このとき、必要な情報をナビゲーション パラメーターとして渡して、新しいページを
+                // 作成します
+                rootFrame.Navigate(typeof(MainPage), param);
+            } else {
+                (rootFrame.Content as MainPage)?.Navigate(param);
+            }
+            // 現在のウィンドウがアクティブであることを確認します
+            Window.Current.Activate();
         }
 
         protected override void OnFileActivated(FileActivatedEventArgs args) {
