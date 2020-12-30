@@ -6,9 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -23,11 +26,52 @@ using Windows.UI.Xaml.Navigation;
 
 namespace ytbrowser
 {
+    public class Requester : IDisposable {
+        
+        public Requester() {
+            Open();
+        }
+
+        Stream mStream;
+
+        private async void Open() {
+            if (null == mStream) {
+                try {
+                    var file = await FileUtil.GetOrCreateFile("request.txt");
+                    var stream = await file.OpenAsync(FileAccessMode.ReadWrite, StorageOpenOptions.AllowOnlyReaders);
+                    mStream = stream.AsStreamForWrite();
+                } catch(Exception e) {
+                    Debug.WriteLine(e);
+                }
+            }
+        }
+
+        public async void Request(string url) {
+            if (mStream == null) return;
+            try {
+                var urlBytes = System.Text.Encoding.UTF8.GetBytes(url + "\r\n");
+                mStream.Seek(0, SeekOrigin.End);
+                await mStream.WriteAsync(urlBytes, 0, urlBytes.Length);
+                await mStream.FlushAsync();
+                Debug.WriteLine($"URL:{url}");
+            } catch(Exception e) {
+                Debug.WriteLine(e);
+            }
+        }
+
+        public void Dispose() {
+            mStream?.Close();
+            mStream?.Dispose();
+            mStream = null;
+        }
+    }
+
     /// <summary>
     /// それ自体で使用できる空白ページまたはフレーム内に移動できる空白ページ。
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private Requester UrlRequester = null;
         private LoadingMonitor LMonitor { get; }
         private BrowserViewModel ViewModel {
             get => DataContext as BrowserViewModel;
@@ -48,18 +92,19 @@ namespace ytbrowser
             ViewModel.AddBookmarkCommand.Subscribe(() => AddBookmark(Browser.DocumentTitle, ViewModel.Url.Value));
             ViewModel.DelBookmarkCommand.Subscribe(() => DelBookmark(ViewModel.Url.Value));
             ViewModel.ShowBookmarkCommand.Subscribe(ShowBookmarks);
-            ViewModel.CopyToClipboardCommand.Subscribe(()=>CopyUrlToClipboard(ViewModel.Url.Value));
+            ViewModel.CopyToClipboardCommand.Subscribe(()=>RequestDownload(ViewModel.Url.Value));
 
             this.InitializeComponent();
         }
 
         private string prevUrl = null;
-        private void CopyUrlToClipboard(string url) {
+        private void RequestDownload(string url) {
             var uri = FixUpUrl(url);
             if (null != uri && uri.Host=="www.youtube.com" && uri.AbsolutePath=="/watch") {
                 if (uri.ToString() != prevUrl) {
                     prevUrl = uri.ToString();
-                    Clipboard.SetContent(new DataPackage().Apply((dp) => dp.SetText(uri.ToString())));
+                    UrlRequester.Request(uri.ToString());
+                    //Clipboard.SetContent(new DataPackage().Apply((dp) => dp.SetText(uri.ToString())));
                 }
             }
         }
@@ -138,7 +183,7 @@ namespace ytbrowser
             Debug.WriteLine(callerName());
             LMonitor.Renew();
             UpdateHistory();
-            CopyUrlToClipboard(args.Uri.ToString());
+            RequestDownload(args.Uri.ToString());
 
             var state = Window.Current.CoreWindow.GetKeyState(VirtualKey.Control);
             if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down) {
@@ -152,7 +197,7 @@ namespace ytbrowser
             ViewModel.Url.Value = args.Uri.ToString();
             LMonitor.OnStartLoading(args.Uri.ToString(), false);
             UpdateHistory();
-            CopyUrlToClipboard(args.Uri.ToString());
+            RequestDownload(args.Uri.ToString());
         }
 
         private void WebView_DOMContentLoaded(WebView sender, WebViewDOMContentLoadedEventArgs args) {
@@ -279,10 +324,6 @@ namespace ytbrowser
         }
         #endregion
 
-        private void OnUnloaded(object sender, RoutedEventArgs e) {
-            Debug.WriteLine(callerName());
-        }
-
         private void UrlKeyDown(object sender, KeyRoutedEventArgs e) {
            if (e.Key == VirtualKey.Enter && sender is TextBox) {
                 Navigate(((TextBox)sender).Text);
@@ -290,8 +331,22 @@ namespace ytbrowser
             }
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs e) {
-            Navigate("https://www.youtube.com");
+        private string InitialUrl = null;
+        protected override void OnNavigatedTo(NavigationEventArgs e) {
+            base.OnNavigatedTo(e);
+            InitialUrl = e.Parameter as string;
         }
+
+        private void OnLoaded(object sender, RoutedEventArgs e) {
+            UrlRequester = new Requester();
+            Navigate(!string.IsNullOrEmpty(InitialUrl) ? InitialUrl : "https://www.youtube.com");
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e) {
+            Debug.WriteLine(callerName());
+            UrlRequester?.Dispose();
+            UrlRequester = null;
+        }
+
     }
 }
