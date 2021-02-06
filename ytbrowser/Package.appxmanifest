@@ -9,7 +9,7 @@
   <Identity
     Name="831bfe09-f728-4dba-964b-2678993c50e3"
     Publisher="CN=toyota-m2k"
-    Version="1.0.2.0" />
+    Version="1.0.3.0" />
 
   <mp:PhoneIdentity PhoneProductId="831bfe09-f728-4dba-964b-2678993c50e3" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
